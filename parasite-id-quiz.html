@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parasite &amp; Microscopic ID · Vet Science CDE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12232b; --ink-2:#2a4552; --paper:#f5f3ec; --card:#ffffff; --line:#d9d5c8;
+    --teal:#0e6e78; --teal-d:#0a545c; --signal:#e07a2f; --signal-d:#c25f18;
+    --good:#2f7d54; --good-bg:#e5f2ea; --bad:#b23b3b; --bad-bg:#f7e6e4; --amber:#d99a1c;
+    --muted:#6d7b80; --shadow:0 1px 2px rgba(18,35,43,.06),0 8px 24px rgba(18,35,43,.08); --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    background:radial-gradient(1200px 500px at 50% -200px,#eef2ee 0%,transparent 70%),var(--paper);
+    color:var(--ink);line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:20px 18px 64px}
+  .mono{font-family:"IBM Plex Mono",monospace}
+
+  header.mast{margin:8px 0 22px}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);font-weight:600;display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--teal)}
+  h1{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(28px,6vw,40px);line-height:1.02;letter-spacing:-.01em;margin:8px 0 6px;color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:56ch;margin:0}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin:16px 0}
+  .panel h2{font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:600;margin:0 0 14px;letter-spacing:-.01em;color:var(--ink);display:flex;align-items:center;gap:10px}
+  .panel h2 .dot{width:9px;height:9px;border-radius:3px;background:var(--signal);flex:0 0 auto}
+  .pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:12px;background:#eef0e9;color:var(--ink-2);border-radius:20px;padding:3px 10px}
+
+  .fams{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+  .fam{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:#fbfaf5;transition:.12s;user-select:none}
+  .fam:hover{border-color:var(--teal);background:#f4faf9}
+  .fam.on{border-color:var(--teal);background:#eef7f6}
+  .fam .chk{width:19px;height:19px;flex:0 0 auto;border-radius:5px;border:1.5px solid #c2c7bd;background:#fff;display:grid;place-items:center;transition:.12s}
+  .fam.on .chk{background:var(--teal);border-color:var(--teal)}
+  .fam .chk svg{width:12px;height:12px;opacity:0;transition:.12s}
+  .fam.on .chk svg{opacity:1}
+  .fam .fx{flex:1;min-width:0}
+  .fam .fn{font-size:14px;font-weight:500;line-height:1.2}
+  .fam .fc{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin-top:3px}
+  .fam .fc b{color:var(--teal)}
+
+  .selrow{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+  .link{background:none;border:0;color:var(--teal);font-size:13px;cursor:pointer;padding:0;font-family:inherit;border-bottom:1px solid #bcd}
+  .link:hover{color:var(--teal-d)}
+  .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
+  .seg{display:inline-flex;background:#eef0e9;border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{font-family:inherit;font-size:14px;font-weight:500;color:var(--muted);background:transparent;border:0;padding:8px 15px;border-radius:8px;cursor:pointer;transition:.12s}
+  .seg button.on{background:#fff;color:var(--teal);box-shadow:var(--shadow)}
+  .grow{flex:1}
+  .btn{background:var(--teal);color:#fff;font-weight:600;font-size:15px;padding:12px 22px;border:0;border-radius:10px;cursor:pointer;transition:.12s;box-shadow:var(--shadow);font-family:inherit}
+  .btn:hover{background:var(--teal-d)}
+  .btn:disabled{background:#b8c2c2;cursor:not-allowed;box-shadow:none}
+  .btn.ghost{background:transparent;color:var(--teal);box-shadow:none;border:1px solid var(--teal);padding:11px 18px}
+  .btn.ghost:hover{background:#eef7f6}
+  .btn.sm{padding:9px 15px;font-size:13.5px}
+  .hint{font-size:13px;color:var(--muted);margin:12px 0 0}
+
+  #quiz .qtop{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .qcount{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2);background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 11px}
+  .qcount b{color:var(--teal)}
+  .passbadge{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:20px;padding:5px 11px;font-weight:600}
+  .scorechip{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--teal)}
+  .timerwrap{height:10px;background:#e7e6dd;border-radius:20px;overflow:hidden;margin-bottom:14px}
+  .timerwrap > i{display:block;height:100%;width:100%;background:var(--teal);border-radius:20px;transition:width .1s linear}
+  .stage{background:#0d1c22;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+  .stage img{width:100%;height:100%;object-fit:contain}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+  @media(max-width:560px){.opts{grid-template-columns:1fr}}
+  .opt{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:11px;padding:14px 16px;font-size:15px;font-weight:500;color:var(--ink);transition:.1s;display:flex;align-items:center;gap:12px;line-height:1.25;cursor:pointer;font-family:inherit}
+  .opt:hover:not(:disabled){border-color:var(--teal);background:#f4faf9}
+  .opt .key{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--teal);width:24px;height:24px;border:1.5px solid var(--line);border-radius:6px;display:grid;place-items:center;font-size:13px;flex:0 0 auto}
+  .opt.correct{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+  .opt.correct .key{border-color:var(--good);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+  .opt.wrong .key{border-color:var(--bad);color:var(--bad)}
+  .opt:disabled{cursor:default}
+  .opt.dim{opacity:.55}
+  .reveal{font-size:14px;color:var(--muted);margin-top:13px;min-height:22px;font-weight:500}
+  .reveal b{color:var(--ink)}
+  .reveal .sci{font-family:"IBM Plex Mono",monospace;color:var(--signal-d)}
+  .qbtns{display:flex;gap:11px;margin-top:15px;align-items:center;flex-wrap:wrap}
+
+  .scorebig{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:56px;line-height:1;color:var(--teal)}
+  .scorebig span{color:var(--teal)}
+  .pct{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--signal-d);margin-top:6px}
+  .scoresub{color:var(--muted);font-size:15px;margin-top:4px}
+  .review{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:8px}
+  .rc{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .rc .ri{aspect-ratio:4/3;background:#0d1c22;display:flex;align-items:center;justify-content:center}
+  .rc .ri img{width:100%;height:100%;object-fit:contain}
+  .rc .rl{padding:8px 10px;font-size:13px;font-weight:500}
+  .rc .rl b{color:var(--ink)}
+  .rc .rl .miss{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:2px}
+
+  .foot{text-align:center;color:var(--muted);font-size:12.5px;margin-top:30px;font-family:"IBM Plex Mono",monospace}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">Veterinary Science CDE</div>
+    <h1>Parasite &amp; Microscopic ID</h1>
+    <p class="sub">California Curricular Code · a photo-identification drill for the 45-item parasite &amp; microscopic list.</p>
+  </header>
+
+  <!-- ============ SETUP ============ -->
+  <section id="setup">
+    <div class="panel">
+      <h2><span class="dot"></span>Choose Categories</h2>
+      <div class="fams" id="fams"></div>
+      <div class="selrow">
+        <button class="link" id="selAll">Select all</button>
+        <button class="link" id="selNone">Clear</button>
+        <button class="link" id="selParasites">Parasites only (skip micro)</button>
+      </div>
+
+      <div class="controls">
+        <div class="seg" id="modeSeg">
+          <button data-mode="study" class="on">Study</button>
+          <button data-mode="timed">Timed · contest sim</button>
+        </div>
+        <div class="grow"></div>
+        <button class="btn" id="startBtn">Start</button>
+      </div>
+      <p class="hint" id="modeHint">Study mode is untimed — answer, review the scientific name, then advance.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz" class="hide">
+    <div class="panel">
+      <div class="qtop">
+        <span class="qcount">Q <b id="qNow">1</b> / <b id="qTot">20</b></span>
+        <span class="passbadge hide" id="passBadge">Pass 1 / 2</span>
+        <span class="scorechip" id="liveScore">0 correct</span>
+      </div>
+      <div class="timerwrap hide" id="timerWrap"><i id="timerBar"></i></div>
+
+      <div class="stage">
+        <img id="qImg" alt="parasite specimen" />
+      </div>
+
+      <div class="opts" id="opts"></div>
+      <div class="reveal" id="reveal"></div>
+
+      <div class="qbtns">
+        <button class="btn ghost sm" id="skipBtn">Skip</button>
+        <div class="grow"></div>
+        <button class="btn hide" id="nextBtn">Next ›</button>
+        <button class="btn ghost sm" id="quitBtn">End</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results" class="hide">
+    <div class="panel">
+      <h2><span class="dot"></span>Results</h2>
+      <div class="scorebig"><span id="rScore">0</span> / <span id="rTot">0</span></div>
+      <div class="pct" id="rPct"></div>
+      <div class="scoresub" id="rSub"></div>
+      <div class="controls" style="margin-top:18px">
+        <button class="btn" id="retryMissed">Retry missed <span class="mono" style="opacity:.7">(untimed)</span></button>
+        <button class="btn ghost" id="againBtn">New round</button>
+        <button class="btn ghost" id="backSetup">Back to setup</button>
+      </div>
+    </div>
+    <div class="panel" id="reviewPanel">
+      <h2><span class="dot"></span>Review · missed &amp; skipped</h2>
+      <div class="review" id="review"></div>
+    </div>
+  </section>
+
+  <div class="foot">Veterinary Science CDE · Parasite &amp; Microscopic Identification</div>
+</div>
+
+<script>
+/* ============================================================
+   DATA — CA FFA Vet Science Curricular Code (Rev. 6/2024)
+   Parasite / Microscopic Identification List (45 items)
+   n=display name, full=official string, sci=taxonomy subtitle,
+   fam=family key, scope=micro|gross, alts=extra filename stems
+   ============================================================ */
+const FAMS = {
+  insects:  {label:"Insects & Flies",       order:1},
+  ticks:    {label:"Mites & Ticks",         order:2},
+  worms:    {label:"Worms (Helminths)",     order:3},
+  protozoa: {label:"Protozoa",              order:4},
+  blood:    {label:"Blood Cells",           order:5},
+  bacteria: {label:"Bacteria",              order:6},
+  crystals: {label:"Crystals & Cytology",   order:7},
+};
+
+const DATA = [
+  // Insects & Flies
+  {n:"Blowfly", full:"Blowfly (Family Calliphoridae)", sci:"Family Calliphoridae", fam:"insects", scope:"gross", alts:["blow-fly","calliphoridae"]},
+  {n:"Cat Warble", full:"Cat Warble (Genus Cuterebra)", sci:"Genus Cuterebra", fam:"insects", scope:"gross", alts:["warble","cuterebra"]},
+  {n:"Fleas", full:"Fleas (Genus Ctenocephalides)", sci:"Genus Ctenocephalides", fam:"insects", scope:"gross", alts:["flea","ctenocephalides"]},
+  {n:"Flea Larva", full:"Flea Larva (Genus Ctenocephalides)", sci:"Genus Ctenocephalides", fam:"insects", scope:"gross", alts:["flea-larvae"]},
+  {n:"Horse Bots", full:"Horse Bots (Genus Gasterophilus)", sci:"Genus Gasterophilus", fam:"insects", scope:"gross", alts:["horse-bot","bots","bot-fly","gasterophilus"]},
+  {n:"Mosquito Adult", full:"Mosquito Adult (Family Culicidae)", sci:"Family Culicidae · Anopheles / Culex / Aedes", fam:"insects", scope:"gross", alts:["mosquito","culicidae"]},
+  {n:"Mosquito Larva", full:"Mosquito Larva (Family Culicidae)", sci:"Family Culicidae · Anopheles / Culex / Aedes", fam:"insects", scope:"gross", alts:["mosquito-larvae"]},
+  {n:"Lice - Biting", full:"Lice - Biting (Order Mallophaga)", sci:"Order Mallophaga · Bovicola / Trichodectes", fam:"insects", scope:"gross", alts:["biting-lice","lice-biting","mallophaga"]},
+  {n:"Lice - Sucking", full:"Lice - Sucking (Order Anoplura)", sci:"Order Anoplura · Linognathus / Hematopinus", fam:"insects", scope:"gross", alts:["sucking-lice","lice-sucking","anoplura"]},
+
+  // Mites & Ticks
+  {n:"Demodectic Mite", full:"Demodectic Mite (Genus Demodex)", sci:"Genus Demodex", fam:"ticks", scope:"micro", alts:["demodex","demodex-mite"]},
+  {n:"Ear Mite", full:"Ear Mite (Genus Otodectes)", sci:"Family Psoroptidae · Genus Otodectes", fam:"ticks", scope:"micro", alts:["otodectes"]},
+  {n:"Sarcoptic Mite", full:"Sarcoptic Mite (Genus Sarcoptes)", sci:"Family Sarcoptidae · Sarcoptes / Notoedres", fam:"ticks", scope:"micro", alts:["sarcoptes","scabies","sarcoptic","sarcopic-mite","sarcopic"]},
+  {n:"Tick - American Dog", full:"Tick - American Dog (Dermacentor variabilis)", sci:"Dermacentor variabilis", fam:"ticks", scope:"gross", alts:["american-dog-tick","dermacentor"]},
+  {n:"Tick - Black Legged Deer", full:"Tick - Black Legged Deer (Ixodes scapularis)", sci:"Ixodes scapularis", fam:"ticks", scope:"gross", alts:["deer-tick","black-legged-tick","ixodes"]},
+  {n:"Tick - Brown Dog", full:"Tick - Brown Dog (Rhipicephalus sanguineus)", sci:"Rhipicephalus sanguineus", fam:"ticks", scope:"gross", alts:["brown-dog-tick","rhipicephalus"]},
+  {n:"Tick - Lonestar", full:"Tick - Lonestar (Amblyomma americanum)", sci:"Amblyomma americanum", fam:"ticks", scope:"gross", alts:["lone-star-tick","lonestar-tick","tick-lone-star","amblyomma"]},
+
+  // Worms (Helminths)
+  {n:"Flea Tapeworm", full:"Flea Tapeworm (Genus Dipylidium)", sci:"Genus Dipylidium", fam:"worms", scope:"gross", alts:["dipylidium"]},
+  {n:"Flea Tapeworm Egg", full:"Flea Tapeworm Egg (Genus Dipylidium)", sci:"Genus Dipylidium", fam:"worms", scope:"micro", alts:["dipylidium-egg"]},
+  {n:"Flea Tapeworm Segment", full:"Flea Tapeworm Segment (Genus Dipylidium)", sci:"Genus Dipylidium · proglottid", fam:"worms", scope:"gross", alts:["dipylidium-segment","flea-tapeworm-proglottid"]},
+  {n:"Heartworm Adult", full:"Heartworm Adult (Genus Dirofilaria)", sci:"Genus Dirofilaria", fam:"worms", scope:"gross", alts:["heartworm","dirofilaria"]},
+  {n:"Heartworm Microfilaria", full:"Heartworm Microfilaria (Genus Dirofilaria)", sci:"Genus Dirofilaria", fam:"worms", scope:"micro", alts:["microfilaria","heartworm-micro"]},
+  {n:"Hookworm Adult", full:"Hookworm Adult (Family Ancylostomatidae)", sci:"Ancylostoma / Uncinaria / Bunostomum", fam:"worms", scope:"gross", alts:["hookworm","ancylostoma"]},
+  {n:"Hookworm Egg", full:"Hookworm Egg (Family Ancylostomatidae)", sci:"Ancylostoma / Uncinaria / Bunostomum", fam:"worms", scope:"micro", alts:["ancylostoma-egg"]},
+  {n:"Horse Strongyles", full:"Horse Strongyles (Genus Strongylus)", sci:"Family Strongylidae · Genus Strongylus", fam:"worms", scope:"gross", alts:["strongyles","strongyle","strongylus"]},
+  {n:"Liver Fluke", full:"Liver Fluke (Class Trematoda)", sci:"Trematoda · Fasciola / Fascioloides", fam:"worms", scope:"gross", alts:["fluke","fasciola","trematode"]},
+  {n:"Roundworm Adult", full:"Roundworm Adult (Family Ascarididae)", sci:"Toxocara / Toxascaris / Ascaris", fam:"worms", scope:"gross", alts:["roundworm","ascarid","toxocara"]},
+  {n:"Roundworm Egg", full:"Roundworm Egg (Family Ascarididae)", sci:"Toxocara / Toxascaris / Ascaris", fam:"worms", scope:"micro", alts:["ascarid-egg","toxocara-egg"]},
+  {n:"Taenia Tapeworm", full:"Taenia Tapeworm (Family Taeniidae)", sci:"Family Taeniidae · Genus Taenia", fam:"worms", scope:"gross", alts:["taenia"]},
+  {n:"Taenia Tapeworm Egg", full:"Taenia Tapeworm Egg (Family Taeniidae)", sci:"Genus Taenia", fam:"worms", scope:"micro", alts:["taenia-egg"]},
+  {n:"Taenia Tapeworm Segment", full:"Taenia Tapeworm Segment (Family Taeniidae)", sci:"Genus Taenia · proglottid", fam:"worms", scope:"gross", alts:["taenia-segment","taenia-proglottid"]},
+  {n:"Whipworm", full:"Whipworm (Genus Trichuris)", sci:"Genus Trichuris", fam:"worms", scope:"gross", alts:["trichuris"]},
+  {n:"Whipworm Egg", full:"Whipworm Egg (Genus Trichuris)", sci:"Genus Trichuris", fam:"worms", scope:"micro", alts:["trichuris-egg"]},
+
+  // Protozoa
+  {n:"Coccidia", full:"Coccidia (Genus Isospora or Eimeria)", sci:"Isospora / Eimeria", fam:"protozoa", scope:"micro", alts:["isospora","eimeria","cystoisospora"]},
+  {n:"Giardia", full:"Giardia (Genus Giardia)", sci:"Genus Giardia", fam:"protozoa", scope:"micro", alts:["giardia-cyst","giardia-troph"]},
+
+  // Blood Cells
+  {n:"Eosinophils", full:"Eosinophils", sci:"White blood cell · granulocyte", fam:"blood", scope:"micro", alts:["eosinophil"]},
+  {n:"Neutrophils", full:"Neutrophils", sci:"White blood cell · granulocyte", fam:"blood", scope:"micro", alts:["neutrophil"]},
+  {n:"Platelets", full:"Platelets", sci:"Thrombocytes", fam:"blood", scope:"micro", alts:["platelet","thrombocyte"]},
+  {n:"Red Blood Cell (Mammalian)", full:"Red Blood cell (Mammalian)", sci:"Erythrocyte · biconcave, anuclear", fam:"blood", scope:"micro", alts:["rbc-mammalian","erythrocyte-mammalian","mammalian-rbc","red-blood-cell-mammal"]},
+  {n:"Red Blood Cell (Avian)", full:"Red Blood cell (Avian)", sci:"Erythrocyte · oval, nucleated", fam:"blood", scope:"micro", alts:["rbc-avian","erythrocyte-avian","avian-rbc"]},
+
+  // Bacteria
+  {n:"Cocci (bacteria)", full:"Cocci (bacteria)", sci:"Spherical bacteria", fam:"bacteria", scope:"micro", alts:["cocci","cocci-bacteria"]},
+  {n:"Rod (bacteria)", full:"Rod (bacteria)", sci:"Bacilli · rod-shaped bacteria", fam:"bacteria", scope:"micro", alts:["rod","rods","bacilli","rod-bacteria"]},
+
+  // Crystals & Cytology
+  {n:"Calcium Oxalate Crystals", full:"Calcium oxalate crystals", sci:"Urine sediment crystal", fam:"crystals", scope:"micro", alts:["calcium-oxalate","calcium-oxalate-crystal"]},
+  {n:"Epithelial Cells (urine)", full:"Epithelial cells (urine)", sci:"Urine sediment", fam:"crystals", scope:"micro", alts:["epithelial-cells","epithelial-cell"]},
+  {n:"Struvite Crystals", full:"Struvite crystals (triple magnesium phosphate)", sci:"Triple phosphate · coffin-lid", fam:"crystals", scope:"micro", alts:["struvite","triple-phosphate","struvite-crystal"]},
+  {n:"Yeast (cytology)", full:"Yeast (cytology)", sci:"Budding yeast", fam:"crystals", scope:"micro", alts:["yeast","malassezia"]},
+];
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+function stems(it){
+  const s=new Set([slug(it.n), slug(it.full)]);
+  (it.alts||[]).forEach(a=>s.add(slug(a)));
+  return [...s].filter(Boolean);
+}
+function candidateURLs(it){
+  const ex=['jpg','jpeg','png'], out=[];
+  stems(it).forEach(st=>ex.forEach(e=>out.push('images/'+st+'.'+e)));
+  return out;
+}
+function probe(url){return new Promise(r=>{const im=new Image();im.onload=()=>r(true);im.onerror=()=>r(false);im.src=url;});}
+async function resolve(it){ for(const u of candidateURLs(it)){ if(await probe(u)){it.img=u;return;} } it.img=null; }
+
+/* ---------- state ---------- */
+const SEC_PER_SLIDE=15, PASSES=2;
+const LS='paraQuiz.v1';
+let selected=new Set(Object.keys(FAMS));
+let mode='study';
+let session=null, timer=null;
+
+function loadPrefs(){
+  try{const p=JSON.parse(localStorage.getItem(LS)||'{}');
+    if(Array.isArray(p.sel)&&p.sel.length){selected=new Set(p.sel.filter(k=>FAMS[k]));}
+    if(p.mode==='timed'||p.mode==='study')mode=p.mode;
+  }catch(e){}
+}
+function savePrefs(){try{localStorage.setItem(LS,JSON.stringify({sel:[...selected],mode}));}catch(e){}}
+
+/* ---------- setup rendering ---------- */
+function famItems(k){return DATA.filter(d=>d.fam===k);}
+
+function renderFams(){
+  const wrap=$('#fams');wrap.innerHTML='';
+  Object.keys(FAMS).sort((a,b)=>FAMS[a].order-FAMS[b].order).forEach(k=>{
+    const total=famItems(k).length;
+    const el=document.createElement('div');
+    el.className='fam'+(selected.has(k)?' on':'');
+    el.innerHTML=`<div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></div>
+      <div class="fx"><div class="fn">${FAMS[k].label}</div><div class="fc"><b>${total}</b> items</div></div>`;
+    el.onclick=()=>{selected.has(k)?selected.delete(k):selected.add(k);el.classList.toggle('on');updateStart();savePrefs();};
+    wrap.appendChild(el);
+  });
+}
+
+function updateStart(){
+  const pool=DATA.filter(d=>d.img&&selected.has(d.fam));
+  const btn=$('#startBtn');
+  btn.disabled=pool.length<2;
+  btn.textContent='Start';
+}
+
+/* ---------- distractors: same fam+scope → same fam → same scope → any ---------- */
+function distractors(correct,count){
+  const others=DATA.filter(d=>d!==correct);
+  const tiers=[
+    others.filter(d=>d.fam===correct.fam&&d.scope===correct.scope),
+    others.filter(d=>d.fam===correct.fam),
+    others.filter(d=>d.scope===correct.scope),
+    others,
+  ];
+  const picked=[],seen=new Set([correct.n]);
+  for(const tier of tiers){
+    for(const d of shuffle(tier)){
+      if(picked.length>=count)break;
+      if(!seen.has(d.n)){seen.add(d.n);picked.push(d);}
+    }
+    if(picked.length>=count)break;
+  }
+  return picked;
+}
+
+/* ---------- quiz flow ---------- */
+function buildQueue(){
+  const pool=shuffle(DATA.filter(d=>d.img&&selected.has(d.fam)));
+  if(mode==='timed'){
+    let q=[];
+    for(let p=0;p<PASSES;p++) q=q.concat(shuffle(pool).map(it=>({it,pass:p+1})));
+    return q;
+  }
+  return pool.map(it=>({it,pass:1}));
+}
+
+function startQuiz(retryList){
+  const queue = retryList ? retryList.map(it=>({it,pass:1})) : buildQueue();
+  session={queue,i:0,correct:0,missed:[],timed:(mode==='timed'&&!retryList),retry:!!retryList};
+  $('#setup').classList.add('hide');$('#results').classList.add('hide');$('#quiz').classList.remove('hide');
+  $('#qTot').textContent=queue.length;
+  $('#timerWrap').classList.toggle('hide',!session.timed);
+  $('#passBadge').classList.toggle('hide',!session.timed);
+  $('#skipBtn').classList.toggle('hide', false);
+  window.scrollTo({top:0,behavior:'smooth'});
+  showQ();
+}
+
+function clearTimer(){if(timer){clearInterval(timer);timer=null;}}
+
+function showQ(){
+  clearTimer();
+  const s=session, cur=s.queue[s.i];
+  $('#qNow').textContent=s.i+1;
+  $('#liveScore').textContent=`${s.correct} correct`;
+  if(s.timed)$('#passBadge').textContent=`Pass ${cur.pass} / ${PASSES}`;
+  $('#reveal').innerHTML='';
+  $('#nextBtn').classList.add('hide');
+  const img=$('#qImg');img.classList.remove('hide');img.src=cur.it.img;
+  // options
+  const opts=shuffle([cur.it,...distractors(cur.it,3)]);
+  const box=$('#opts');box.innerHTML='';
+  opts.forEach((o,idx)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML=`<span class="key">${'ABCD'[idx]}</span><span>${o.n}</span>`;
+    b.onclick=()=>answer(b,o,cur.it);
+    box.appendChild(b);
+  });
+  $('#skipBtn').disabled=false;
+  if(s.timed)runTimer();
+}
+
+function runTimer(){
+  const bar=$('#timerBar');let ms=SEC_PER_SLIDE*1000;const step=100;
+  bar.style.width='100%';bar.style.background='var(--teal)';
+  timer=setInterval(()=>{
+    ms-=step;const frac=Math.max(0,ms/(SEC_PER_SLIDE*1000));
+    bar.style.width=(frac*100)+'%';
+    const sec=ms/1000;
+    bar.style.background= sec<=5?'var(--bad)': sec<=8?'var(--orange)':'var(--teal)';
+    if(ms<=0){clearTimer();timeout();}
+  },step);
+}
+
+function lockOpts(correctIt,chosenIt){
+  $$('#opts .opt').forEach(b=>{
+    b.disabled=true;
+    const name=b.querySelector('span:last-child').textContent;
+    if(name===correctIt.n)b.classList.add('correct');
+    else if(chosenIt&&name===chosenIt.n)b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  $('#skipBtn').disabled=true;
+}
+
+function reveal(it,tag){
+  $('#reveal').innerHTML=`${tag} <b>${it.n}</b> &nbsp;·&nbsp; <span class="sci">${it.sci}</span>`;
+}
+
+function answer(btn,chosen,correctIt){
+  clearTimer();
+  const s=session;
+  const right=chosen.n===correctIt.n;
+  if(right){s.correct++;reveal(correctIt,'✓');}
+  else{s.missed.push(correctIt);reveal(correctIt,'✗ &nbsp;Correct:');}
+  lockOpts(correctIt,chosen);
+  $('#liveScore').textContent=`${s.correct} correct`;
+  if(s.timed){setTimeout(next,1400);}
+  else{const nb=$('#nextBtn');nb.classList.remove('hide');nb.focus();}
+}
+
+function timeout(){
+  const s=session,cur=s.queue[s.i];
+  s.missed.push(cur.it);
+  reveal(cur.it,'⧗ &nbsp;Time — Correct:');
+  lockOpts(cur.it,null);
+  setTimeout(next,1400);
+}
+
+function skip(){
+  clearTimer();
+  const s=session,cur=s.queue[s.i];
+  s.missed.push(cur.it);
+  reveal(cur.it,'↷ &nbsp;Skipped — Correct:');
+  lockOpts(cur.it,null);
+  if(s.timed){setTimeout(next,1400);}
+  else{const nb=$('#nextBtn');nb.classList.remove('hide');nb.focus();}
+}
+
+function next(){
+  const s=session;s.i++;
+  if(s.i>=s.queue.length)finish();
+  else showQ();
+}
+
+function finish(){
+  clearTimer();
+  const s=session;
+  $('#quiz').classList.add('hide');$('#results').classList.remove('hide');
+  const tot=s.queue.length;
+  $('#rScore').textContent=s.correct;$('#rTot').textContent=tot;
+  const pct=tot?Math.round(s.correct/tot*100):0;
+  $('#rPct').textContent=pct+'%';
+  // unique missed (a name can repeat across two timed passes)
+  const uniqMissed=[...new Map(s.missed.map(m=>[m.n,m])).values()];
+  let sub;
+  if(pct===100)sub='Perfect round — every specimen identified.';
+  else if(pct>=85)sub='Contest-ready. Tighten up the misses below.';
+  else if(pct>=70)sub='Solid. Focus review on the flagged items.';
+  else sub='Keep drilling — review each missed specimen below.';
+  $('#rSub').textContent=sub;
+  window._missed=uniqMissed;
+  $('#retryMissed').style.display=uniqMissed.length?'':'none';
+  $('#reviewPanel').classList.toggle('hide',!uniqMissed.length);
+  const rv=$('#review');rv.innerHTML='';
+  uniqMissed.forEach(it=>{
+    const c=document.createElement('div');c.className='rc';
+    c.innerHTML=`<div class="ri"><img src="${it.img}" alt=""></div>
+      <div class="rl"><b>${it.n}</b><div class="miss">${FAMS[it.fam].label}</div></div>`;
+    rv.appendChild(c);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- wire up ---------- */
+$('#modeSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  mode=b.dataset.mode;
+  $$('#modeSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  $('#modeHint').textContent = mode==='timed'
+    ? `Timed contest sim: ${SEC_PER_SLIDE}s per slide, ${PASSES} passes of your selected pool. Amber ≤8s, red ≤5s, auto-advances.`
+    : 'Study mode is untimed — answer, review the scientific name, then advance.';
+  savePrefs();
+});
+$('#startBtn').onclick=()=>startQuiz(null);
+$('#skipBtn').onclick=skip;
+$('#nextBtn').onclick=next;
+$('#quitBtn').onclick=()=>{clearTimer();session&&session.i>0?finish():backToSetup();};
+$('#retryMissed').onclick=()=>{if(window._missed&&window._missed.length)startQuiz(window._missed);};
+$('#againBtn').onclick=()=>startQuiz(null);
+$('#backSetup').onclick=backToSetup;
+$('#selAll').onclick=()=>{selected=new Set(Object.keys(FAMS));renderFams();updateStart();savePrefs();};
+$('#selNone').onclick=()=>{selected=new Set();renderFams();updateStart();savePrefs();};
+$('#selParasites').onclick=()=>{selected=new Set(['insects','ticks','worms','protozoa']);renderFams();updateStart();savePrefs();};
+document.addEventListener('keydown',e=>{
+  if($('#quiz').classList.contains('hide'))return;
+  if(e.key==='Enter'&&!$('#nextBtn').classList.contains('hide')){next();}
+  if('1234'.includes(e.key)){const b=$$('#opts .opt')[+e.key-1];if(b&&!b.disabled)b.click();}
+});
+
+function backToSetup(){
+  clearTimer();session=null;
+  $('#quiz').classList.add('hide');$('#results').classList.add('hide');$('#setup').classList.remove('hide');
+  renderFams();updateStart();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- boot ---------- */
+(async function init(){
+  loadPrefs();
+  $$('#modeSeg button').forEach(x=>x.classList.toggle('on',x.dataset.mode===mode));
+  $('#modeHint').textContent = mode==='timed'
+    ? `Timed contest sim: ${SEC_PER_SLIDE}s per slide, ${PASSES} passes of your selected pool. Amber ≤8s, red ≤5s, auto-advances.`
+    : 'Study mode is untimed — answer, review the scientific name, then advance.';
+  renderFams();updateStart();
+  await Promise.all(DATA.map(resolve));
+  renderFams();updateStart();
+})();
+</script>
+</body>
+</html>
